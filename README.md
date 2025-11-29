@@ -27,7 +27,7 @@ The **email body** is used as the input text.
 
 ---
 
-## 🧪 Models
+## Models
 
 ### **1) Naive Bayes (TF–IDF baseline)**  
 - 10,000 TF–IDF features  
