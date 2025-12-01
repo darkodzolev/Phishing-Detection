@@ -1,76 +1,141 @@
-# Phishing Email Detection (NLP Project)
+# Phishing-Detection
 
-A Natural Language Processing project for classifying emails as **phishing (spam)** or **legitimate**.  
-Two approaches are implemented and compared: a **Naive Bayes baseline** and a **deep learning LSTM model**.
+A Natural Language Processing project for classifying emails as phishing or legitimate using a classic ML baseline (Naive Bayes) and a deep learning model (LSTM).
 
----
+Important Files
+- Exploration: [`notebooks/01_exploration.ipynb`](notebooks/01_exploration.ipynb)
+- Preprocessing: [`notebooks/02_preprocessing.ipynb`](notebooks/02_preprocessing.ipynb)
+- Naive Bayes Model: [`notebooks/03_naive_bayes.ipynb`](notebooks/03_naive_bayes.ipynb)
+- LSTM Model: [`notebooks/04_lstm.ipynb`](notebooks/04_lstm.ipynb)
+- Model Comparison: [`notebooks/05_comparison.ipynb`](notebooks/05_comparison.ipynb)
+- Saved Models: [`models/naive_bayes.pkl`](models/naive_bayes.pkl), [`models/lstm.h5`](models/lstm.h5)
+- Evaluation Reports: [`results/nb_report.txt`](results/nb_report.txt), [`results/lstm_report.txt`](results/lstm_report.txt)
+- Projektreport: [`report/Report.md`](report/Report.md)
+- Dependencies: [`requirements.txt`](requirements.txt)
 
-## Dataset
+## 1) Setup
 
-Phishing Email Dataset (Kaggle)  
-Final subset used: **39,154 emails**  
-- 21,842 phishing (label 1)  
-- 17,312 legitimate (label 0)  
-- Columns include: sender, receiver, date, subject, body, label  
+Open a terminal inside the project folder and create the environment:
+```
+cd "C:\path\to\PHISHING-EMAIL-NLP"
+python -m venv .venv
+.venv\Scripts\activate
+pip install -r requirements.txt
+```
+Start Jupyter Notebook:
+```
+jupyter notebook
+``` 
 
-The **email body** is used as the input text.
+## 2) Prepare the Data
 
----
+Dataset: Phishing Email Dataset (Kaggle)
 
-## Preprocessing
+Stored at: [`data/raw/CEAS_08.csv`](data/raw/CEAS_08.csv)
 
-- Lowercasing  
-- Removing URLs, HTML, punctuation, numbers  
-- Removing extra whitespace  
-- Stopwords (for LSTM)  
-- Saved as `data/processed/cleaned.csv`
+After preprocessing: [`data/processed/cleaned.csv`](data/processed/cleaned.csv)
 
----
+- `clean_body` (text after cleaning)
+- `label` (0 = legitimate, 1 = phishing)
 
-## Models
+## 3) Dataset Exploration
 
-### **1) Naive Bayes (TF–IDF baseline)**  
-- 10,000 TF–IDF features  
-- `MultinomialNB` classifier  
-- Model saved as `naive_bayes.pkl`  
+Notebook: [`01_exploration.ipynb`](notebooks/01_exploration.ipynb)
 
-**Results:**  
-- Accuracy: ~**0.97**  
-- Legitimate: Precision 0.94 / Recall 1.00  
-- Phishing: Precision 1.00 / Recall 0.95  
+Includes:
+- Shape, columns, dtypes
+- Missing value inspection
+- Label distribution (bar plot)
+- Email body length statistics
+- Histogram of text length
 
----
+## 4) Preprocessing
 
-### **2) LSTM (Deep Learning)**  
-- Tokenizer (10k vocab)  
-- Sequences padded to length 300  
-- Embedding → LSTM → Dense  
-- Model saved as `lstm.keras`  
+Notebook: [`02_preprocessing.ipynb`](notebooks/02_preprocessing.ipynb)
 
-**Results:**  
-- Accuracy: ~**0.99**  
-- Both classes: ~0.99 precision/recall/F1  
+Includes:
+- Lowercasing
+- Remove URLs, HTML, numbers, punctuation
+- Normalize whitespace
+- Create `clean_body`
+- Save cleaned dataset
 
----
+## 5) Train the Models
 
-## Summary
+### Naive Bayes (Baseline)
 
-- Naive Bayes provides a strong baseline (~97% accuracy).  
-- LSTM improves performance to ~99%, capturing deeper linguistic patterns.  
-- Both models show excellent performance on phishing detection.
+Notebook: [`03_naive_bayes.ipynb`](notebooks/03_naive_bayes.ipynb)
 
----
+Process:
+- TF-IDF with 10,000 features
+- Stratified train/test split
+- Train `MultinomialNB`
+- Classification report + confusion matrix
+- Save model: `models/naive_bayes.pkl`
 
-## Notebooks
+Expected performance:
+- Accuracy: ~0.97
+- F1-score: ~0.97-0.98
 
-- **01** — Exploration  
-- **02** — Preprocessing  
-- **03** — Naive Bayes  
-- **04** — LSTM  
+### LSTM (Deep Learning)
 
----
+Notebook: [`04_lstm.ipynb`](notebooks/04_lstm.ipynb)
 
-## Notes
+Process:
+- Tokenization (vocab size 10,000)
+- Padding to length 300
+- Embedding → LSTM → Dense
+- Validation split during training
+- Accuracy curves
+- Classification report + confusion matrix
+- Save model: `models/lstm.h5`
 
-- TensorFlow requires Python 3.10/3.11 (used in this project).  
-- All results and models are stored in `/results` and `/models`.
+Expected performance:
+- Accuracy: ~0.98-0.99
+- F1-score: ~0.98-0.99
+
+## 6) Model Comparison
+
+Notebook: [`05_comparison.ipynb`](notebooks/05_comparison.ipynb)
+
+Includes:
+- Parsing both classification reports
+- Comparison tables (accuracy, macro/weighted F1)
+- Bar plots: overall metrics
+- Bar plots: class-wise F1
+- Final summary of results
+
+The LSTM model outperforms Naive Bayes by about 1 percentage point in overall accuracy and macro F1.
+
+## 7) File Descriptions
+
+- `01_exploration.ipynb`: Initial dataset inspection and basic statistics
+
+- `02_preprocessing.ipynb`: Text cleaning and export
+
+- `03_naive_bayes.ipynb`: Baseline model with TF-IDF + NB
+
+- `04_lstm.ipynb`: Deep learning model (embedding + LSTM)
+
+- `05_comparison.ipynb`: Full side-by-side evaluation of NB and LSTM
+
+- `models/`: Saved model artifacts
+
+- `results/`: Text-based classification reports (sklearn output)
+
+## 8) Common Issues
+
+- TensorFlow errors: ensure Python 3.10 or 3.11
+- Import errors (`ModuleNotFoundError`): activate the virtual environment before starting Jupyter:
+
+    ```
+    .venv\Scripts\activate
+    jupyter notebook
+    ```
+
+## 9) Notes
+
+- Notebook 05 is ideal for presentation (plots + summary).
+- Naive Bayes is extremely fast and strong for this dataset.
+- LSTM performs best and captures deeper patterns.
+- Entire workflow is reproducible through the notebooks.
